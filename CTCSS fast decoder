@@ -1,0 +1,460 @@
+// Frequency counter sketch, for measuring frequencies low enough to execute an interrupt for each cycle
+// Connect the frequency source to the INT0 pin (digital pin 2 on an Arduino Uno)
+// By Adrian, YO3HJV
+// This work is released to Public Domain
+// First published on January, 18th 2015 on
+// http://yo3hjv.blogspot.ro/2015/01/ctcss-decoder-with-arduino.html
+// This code can be used for free but I will appreciate if you mention the author.
+
+// 73 de Adrian, YO3HJV
+
+   #include <LiquidCrystal.h>
+   #include <Wire.h>   
+  / *May be uncomment for standard Arduino LCD library. 
+I am using a weird library  here...  */
+  
+   LiquidCrystal lcd(8, 9, 4, 5, 6, 7);  // set for my configuration. Let PIN2 to be the input for the signal.
+
+volatile unsigned long timpPrimImpuls;
+volatile unsigned long timpUltimImpuls;
+volatile unsigned long numImpuls;
+
+
+
+      void setup()
+      {
+ //Serial.begin(19200);    // print for debugging. Uncomment if necessary
+ 
+        lcd.begin(16, 2);
+      }
+
+// Measure the frequency over the specified sample time in milliseconds, returning the frequency in Hz
+
+
+      float readFrequency(unsigned int sampleTime)
+      {
+            numImpuls = 0;                          // start a new reading
+            attachInterrupt(0, counter, RISING);    // enable the interrupt
+           
+            delay(sampleTime);
+            detachInterrupt(0);
+            return (numImpuls < 3) ? 0 : (996500.0 * (float)(numImpuls - 2))/(float)(timpUltimImpuls - timpPrimImpuls);
+      }
+              // NOTE: 996500.0 is the value find by me. The theoretic value is "1000000000.0"
+              // Start with this value and check the precision against a good frequency meter.
+    
+
+     void loop()
+      {
+        float freq = readFrequency(100);
+ 
+          lcd.setCursor(0, 0);
+ 
+        lcd.print("Freq: ");
+        lcd.print (freq);
+        lcd.print(" ");
+        lcd.print("Hz   ");
+   
+
+ 
+        lcd.setCursor (0, 1);
+                                                   // Too low but over 10 Hz
+          if ((freq > 10) && (freq < 65.8))
+          {
+            lcd.print("    TOO LOW     ");
+            //DO SOMETHING
+          }
+    
+   
+     else  if ((freq > 66.00) && (freq < 68.00))
+          {
+            lcd.print("CT: 67.0 Hz, XZ ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 68.30) && (freq < 70.30))
+          {
+            lcd.print("CT: 69.3 Hz, WZ ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 70.90) && (freq < 72.90))
+          {
+            lcd.print("CT: 71.9 Hz, XA ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 73.40) && (freq < 75.40))
+          {
+            lcd.print("CT: 74.4 Hz, WA ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 76.00) && (freq < 78.00))
+          {
+            lcd.print("CT: 77.0 Hz, XB ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 78.70) && (freq < 79.70))
+          {
+            lcd.print("CT: 79.70 Hz, WB ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 81.50) && (freq < 83.50))
+          {
+            lcd.print("CT: 82.5 Hz, YZ ");
+            //DO SOMETHING
+          }
+  
+  
+     else if ((freq > 84.30) && (freq < 86.50))
+          {
+            lcd.print("CT: 85.4 Hz, YA ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 87.40) && (freq < 89.60))
+          {
+            lcd.print("CT: 88.5 Hz, YB ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 90.40) && (freq < 92.60))
+          {
+            lcd.print("CT: 91.5 Hz, ZZ ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 93.7) && (freq < 95.90))
+          {
+            lcd.print("CT: 94.8 Hz, ZA ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 96.30) && (freq < 98.5))
+          {
+            lcd.print("CT: 97.4 Hz, ZB ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 99.00) && (freq < 101.00))
+          {
+            lcd.print("CT: 100.0 Hz, 1Z ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 102.40) && (freq < 104.60))
+          {
+            lcd.print("CT: 103.5 Hz, 1A ");
+            //DO SOMETHING
+          }
+  
+  
+     else if ((freq > 106.10) && (freq < 108.30))
+          {
+            lcd.print("CT: 107.2 Hz, 1B ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 109.80) && (freq < 112.00))
+          {
+            lcd.print("CT: 110.9 Hz, 2Z ");
+            //DO SOMETHING
+          }
+  
+  
+     else if ((freq > 113.60) && (freq < 116.00))
+          {
+            lcd.print("CT: 114.8 Hz, 2A ");
+            //DO SOMETHING
+          }
+  
+  
+     else if ((freq > 117.60) && (freq < 119.90))
+          {
+            lcd.print("CT: 118.8 Hz, 2B ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 122.00) && (freq < 124.00))
+          {
+            lcd.print("CT: 123.0 Hz, 3Z ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 126.20) && (freq < 128.40))
+          {
+            lcd.print("CT: 127.3 Hz, 3A ");
+          }
+  
+  
+     else if ((freq > 130.40) && (freq < 133.00))
+          {
+            lcd.print("CT: 131.8 Hz, 3B ");
+          }
+  
+  
+     else if ((freq > 135.00) && (freq < 138.00))
+          {
+            lcd.print("CT: 136.5 Hz, 4Z ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 140.00) && (freq < 142.80))
+          {
+            lcd.print("CT: 141.3 Hz, 4A ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 145.00) && (freq < 147.80))
+          {
+            lcd.print("CT: 146.2 Hz, 4B ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 150.00) && (freq < 152.80))
+          {
+            lcd.print("CT: 151.4 Hz, 5Z ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 156.00) && (freq < 158.80))
+          {
+            lcd.print("CT: 157.7 Hz, 5A ");
+            //DO SOMETHING
+          }
+                                                      // NON-STANDARD
+   
+   
+     else if ((freq > 159.00) && (freq < 161.00))
+          {
+            lcd.print("CT: 159.8 Hz, -- ");
+            //DO SOMETHING
+          }
+    
+  
+  
+     else if ((freq > 161.00) && (freq < 163.50))
+          {
+            lcd.print("CT: 162.2 Hz, 5B ");
+            //DO SOMETHING
+          }
+                                                      // NON-STANDARD
+    
+    
+     else if ((freq > 164.00) && (freq < 166.30))
+          {
+            lcd.print("CT: 165.5 Hz, -- ");
+            //DO SOMETHING
+          }
+    
+   
+   
+     else if ((freq > 166.60) && (freq < 169.00))
+          {
+            lcd.print("CT: 167.9 Hz, 6Z ");
+            //DO SOMETHING
+          }
+                                                      // NON-STANDARD
+   
+   
+     else if ((freq > 170.00) && (freq < 172.40))
+          {
+            lcd.print("CT: 171.3 Hz, -- ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 172.60) && (freq < 175.00))
+          {
+            lcd.print("CT: 173.8 Hz, 6A ");
+            //DO SOMETHING
+          }
+                                                      //NON-STANDARD
+   
+     else if ((freq > 176.00) && (freq < 178.50))
+          {
+            lcd.print("CT: 177.3 Hz, -- ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 178.6) && (freq < 181.00))
+          {
+            lcd.print("CT: 179.9 Hz, 6Z ");
+            //DO SOMETHING
+          }
+                                                      //NON-STANDARD
+   
+     else if ((freq > 182.00) && (freq < 184.80))
+          {
+            lcd.print("CT: 183.5 Hz, -- ");
+            //DO SOMETHING
+          }
+    
+   
+     else if ((freq > 185.00) && (freq < 187.50))
+          {
+            lcd.print("CT: 186.2 Hz, 7Z ");
+            //DO SOMETHING
+          }
+                                                       //NON-STANRDARD
+  
+     else if ((freq > 188.40) && (freq < 191.30))
+          {
+            lcd.print("CT: 189.9 Hz, -- ");
+            //DO SOMETHING
+          }
+    
+   
+     else if ((freq > 191.00) && (freq < 194.00))
+          {
+            lcd.print("CT: 192.8 Hz, 7A ");
+            //DO SOMETHING
+          }
+                                                       //NON-STANDARD
+   
+     else if ((freq > 195.40) && (freq < 198.00))
+          {
+            lcd.print("CT: 196.6 Hz, -- ");
+            //DO SOMETHING
+          }    
+                                                       //NON-STANDARD
+   
+     else if ((freq > 198.30) && (freq < 201.00))
+          {
+            lcd.print("CT: 199.5 Hz, -- ");
+            //DO SOMETHING
+          }    
+    
+   
+     else if ((freq > 202.00) && (freq < 204.00))
+          {
+            lcd.print("CT: 203.5 Hz, M1 ");
+            //DO SOMETHING
+          }
+    
+   
+     else if ((freq > 205.00) && (freq < 208.00))
+          {
+            lcd.print("CT: 206.5 Hz, 8Z ");
+            //DO SOMETHING
+          }
+    
+   
+     else if ((freq > 209) && (freq < 212.00))
+          {
+            lcd.print("CT: 210.7 Hz, M2 ");
+            //DO SOMETHING
+          }
+  
+  
+     else if ((freq > 217.00) && (freq < 219.30))
+          {
+            lcd.print("CT: 218.1 Hz, M3 ");
+          }
+   
+   
+     else if ((freq > 224.00) && (freq < 227.00))
+          {
+            lcd.print("CT: 225.7 Hz, M4 ");
+          }
+   
+   
+     else if ((freq > 227.60) && (freq < 231.30))
+          {
+            lcd.print("CT: 229.1 Hz, 9Z ");
+            //DO SOMETHING
+          }
+  
+   
+     else if ((freq > 231.70) && (freq < 235.00))
+          {
+            lcd.print("CT: 233.6 Hz, -- ");
+            //DO SOMETHING
+          }
+    
+  
+  
+     else if ((freq > 239.60) && (freq < 243.00))
+          {
+            lcd.print("CT: 241.8 Hz, M6 ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 248.00) && (freq < 252.00))
+          {
+            lcd.print("CT: 250.3 Hz, M7 ");
+            //DO SOMETHING
+          }
+   
+   
+     else if ((freq > 252.70) && (freq < 256.80))
+          {
+            lcd.print("CT: 254.1 Hz, 0Z ");
+            //DO SOMETHING
+          }
+       
+   
+     else if (freq > 256.80)
+          {
+            lcd.print("   TOO HIGH     ");
+            //DO SOMETHING
+          }
+
+    
+    
+    
+                 else
+                {
+                lcd.setCursor (0, 1);
+                lcd.print("    NOISE       ");
+                // or, comment the line above and
+                // uncomment the line below for an empty LCD line
+            //  lcd.print("                ");
+                }
+ 
+ 
+  delay(50);
+ // lcd.clear();      //Not necessary. uncomment but will flicker!
+
+ 
+} //END OF LOOP
+
+
+
+void counter()
+{
+  unsigned long now = micros();
+  if (numImpuls == 1)
+  {
+    timpPrimImpuls = now;
+  }
+  else
+  {
+    timpUltimImpuls = now;
+  }
+  ++numImpuls;
+}
